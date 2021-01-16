@@ -262,7 +262,7 @@ private:
       if( is_empty(vers) && path.empty() ) {
          if( const iri_range r = find_iri(iri) ) {
             idp = &(*r.begin());
-            BOOST_ASSERT( distance(r) == 1 );
+            BOOST_ASSERT( distance(r.begin(), r.end()) == 1 );
          }
       }
       return idp;

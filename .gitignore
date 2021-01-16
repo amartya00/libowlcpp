@@ -4,3 +4,9 @@
 /.pydevproject
 /.settings
 *.pyc
+.kdev4/
+.vscode/
+_build/
+build_kdev/
+build/
+*.kdev4
