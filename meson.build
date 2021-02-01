@@ -13,12 +13,13 @@ add_global_arguments('--std=c++17', '-Werror', language : 'cpp')
 boost = dependency('boost', modules : ['filesystem'])
 factplusplus = dependency('factplusplus')
 raptor2 = dependency('raptor2')
+catch = dependency('catch2')
 
-# Set up sources
+# Set up includes
 inc = include_directories('include')
 
 # Sub projects
-subdir('rdf')
-subdir('io')
-subdir('logic')
-subdir('libinfo')
+subdir('src/rdf')
+subdir('src/io')
+subdir('src/logic')
+subdir('src/libinfo')

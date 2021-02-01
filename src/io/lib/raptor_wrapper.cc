@@ -11,6 +11,8 @@ part of owlcpp project.
 #include "boost/lexical_cast.hpp"
 #include "raptor2.h"
 
+using namespace boost::placeholders;
+
 namespace owlcpp { namespace{
 
 Raptor_wrapper::Err make_exception(char const* msg, raptor_locator* locator) {
