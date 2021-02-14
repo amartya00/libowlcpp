@@ -10,7 +10,7 @@ add_global_arguments('--std=c++17', '-Werror', language : 'cpp')
 
 
 # Dependencies
-boost = dependency('boost', modules : ['filesystem'])
+boost = dependency('boost', modules : ['filesystem', 'system'])
 factplusplus = dependency('factplusplus')
 raptor2 = dependency('raptor2')
 catch = dependency('catch2')
