@@ -13,8 +13,6 @@ part of owlcpp project.
 
 #include <catch2/catch.hpp>
 
-#define CATCH_CONFIG_MAIN
-
 using owlcpp::Triple_store;
 using owlcpp::Nodes_none;
 using owlcpp::Doc_id;

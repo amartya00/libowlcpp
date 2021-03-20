@@ -11,3 +11,4 @@ build_kdev/
 build/
 *.kdev4
 meson_build/
+meson.build.user
