@@ -5,6 +5,7 @@ map_id_object_test = executable('map_id_object_test', 'map_id_object_run.cc', in
 map_node_iri_test = executable('map_node_iri_test', 'map_node_iri_run.cc', include_directories: [inc, rdf_inc], link_with: rdf)
 map_node_test = executable('map_node_test', 'map_node_run.cc', include_directories: [inc, rdf_inc], link_with: rdf)
 map_ns_test = executable('map_ns_test', 'map_ns_run.cc', include_directories: [inc, rdf_inc], link_with: rdf)
+map_std_test = executable('map_std_test', 'map_std_run.cc', include_directories: [inc, rdf_inc], link_with: rdf)
 
 test('Copy triples', copy_triples_test)
 test('ID tracker', id_tracker_test)
@@ -13,3 +14,4 @@ test('Map ID object', map_id_object_test)
 test('Mapd doc iri', map_node_iri_test)
 test('Map doc', map_doc_test)
 test('Map ns', map_ns_test)
+test('Map std', map_std_test)
