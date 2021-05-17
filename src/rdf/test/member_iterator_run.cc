@@ -3,59 +3,71 @@ part of owlcpp project.
 @n @n Distributed under the Boost Software License, Version 1.0; see doc/license.txt.
 @n Copyright Mikhail K Levin 2012
 *******************************************************************************/
-#define BOOST_TEST_MODULE member_iterator_run
-#include "boost/test/unit_test.hpp"
-#include "test/exception_fixture.hpp"
+#define CATCH_CONFIG_MAIN
+
+#include <catch2/catch.hpp>
+
 #include <map>
 #include <vector>
-#include "boost/range.hpp"
-#include "boost/foreach.hpp"
-#include "owlcpp/detail/member_iterator.hpp"
-#include "owlcpp/detail/iterator_member_pair.hpp"
-#include "boost/multi_index/detail/hash_index_iterator.hpp"
 
-namespace owlcpp{ namespace test{
+#include <boost/range.hpp>
+#include <boost/foreach.hpp>
+#include <owlcpp/detail/member_iterator.hpp>
+#include <owlcpp/detail/iterator_member_pair.hpp>
+#include <boost/multi_index/detail/hash_index_iterator.hpp>
 
-/**@test
-*******************************************************************************/
-BOOST_AUTO_TEST_CASE( test_pair_iter ) {
-   typedef std::map<int, double> map_t;
+using owlcpp::Iterator_member_pair;
+using owlcpp::Member_iterator;
 
-   typedef Iterator_member_pair<map_t::const_iterator, const double, 2> iter_t;
-   typedef boost::iterator_range<iter_t> range_t;
+typedef std::map<int, double> map_t;
+typedef Iterator_member_pair<map_t::const_iterator, const double, 2> iter_t;
+typedef boost::iterator_range<iter_t> range_t;
 
-   map_t map;
-   map[1] = 2.5;
-   map[42] = 42;
-   range_t r1(map.begin(), map.end());
-   BOOST_CHECK_EQUAL(distance(r1), 2);
+SCENARIO("Pair iterator test") {
 
-   range_t r2(map.end(), map.end());
-   BOOST_CHECK_EQUAL(distance(r2), 0);
+   GIVEN("I have initialized a map") {
+
+      map_t map {
+         {1, 2.5},
+         {42, 42}
+      };
+
+      THEN("The ranges shoukd be as expected") {
+
+         range_t r1(map.begin(), map.end());
+         range_t r2(map.end(), map.end());
+
+         REQUIRE(boost::distance(r1) == 2);
+         REQUIRE(boost::distance(r2) == 0);
+      }
+   }
 }
 
-struct A {int a; double b;};
+SCENARIO("Test custom struct iter") {
 
-/**@test
-*******************************************************************************/
-BOOST_AUTO_TEST_CASE( test_struct_iter ) {
-   typedef std::vector<A> vector_t;
-   typedef Member_iterator<
-            vector_t::const_iterator,
-            const double,
-            &A::b
-            > iter_t;
-   typedef boost::iterator_range<iter_t> range_t;
-   vector_t v;
-   v.push_back(A());
-   v.push_back(A());
+   GIVEN("I have a custom struct") {
 
-   range_t r1(v.begin(), v.end());
-   BOOST_CHECK_EQUAL(distance(r1), 2);
+      struct A {int a; double b;};
+      typedef std::vector<A> vector_t;
+      typedef Member_iterator<
+               vector_t::const_iterator,
+               const double,
+               &A::b
+               > iter_t;
+      typedef boost::iterator_range<iter_t> range_t;
 
-   range_t r2(v.end(), v.end());
-   BOOST_CHECK_EQUAL(distance(r2), 0);
+      AND_GIVEN("I have a vector of type A") {
+
+         vector_t v {A(), A()};
+
+         THEN("The ranges should work correctly") {
+
+            range_t r1(v.begin(), v.end());
+            range_t r2(v.end(), v.end());
+
+            REQUIRE(boost::distance(r1) == 2);
+            REQUIRE(boost::distance(r2) == 0);
+         }
+      }
+   }
 }
-
-}//namespace test
-}//namespace owlcpp
