@@ -3,17 +3,28 @@ part of owlcpp project.
 @n @n Distributed under the Boost Software License, Version 1.0; see doc/license.txt.
 @n Copyright Mikhail K Levin 2012
 *******************************************************************************/
-#define BOOST_TEST_MODULE map_triple_02_run
-#include "boost/test/unit_test.hpp"
-#include "boost/range.hpp"
-#include "test/exception_fixture.hpp"
+#define CATCH_CONFIG_MAIN
+
+#include <catch2/catch.hpp>
 #include <iostream>
 
-#include "owlcpp/rdf/map_triple.hpp"
-#include "rdf/test/test_utils.hpp"
+#include <owlcpp/rdf/map_triple.hpp>
+#include <test_utils.hpp>
+
+
 namespace mpl = boost::mpl;
 
-namespace owlcpp{ namespace test{
+using owlcpp::Node_id;
+using owlcpp::Doc_id;
+using owlcpp::Doc_tag;
+using owlcpp::Map_triple;
+using owlcpp::Doc_tag;
+using owlcpp::Subj_tag;
+using owlcpp::Pred_tag;
+using owlcpp::Obj_tag;
+using owlcpp::test::insert_seq;
+using owlcpp::test::random_triples1;
+using owlcpp::any;
 
 const unsigned t[][4] = {
          {0,1,0,0},
@@ -25,10 +36,8 @@ const unsigned t[][4] = {
          {0,4,0,0},
 };
 
-/**@test
-*******************************************************************************/
-BOOST_AUTO_TEST_CASE( test_map_triple_01 ) {
-   typedef Map_triple<
+
+typedef Map_triple<
             mpl::vector4<
                mpl::vector4<Subj_tag, Pred_tag, Obj_tag, Doc_tag>,
                mpl::vector4<Pred_tag, Subj_tag, Obj_tag, Doc_tag>,
@@ -36,44 +45,81 @@ BOOST_AUTO_TEST_CASE( test_map_triple_01 ) {
                mpl::vector4<Doc_tag, Pred_tag, Subj_tag, Obj_tag>
             >
    > map_triple;
-   map_triple tm;
-   insert_seq(tm, t);
 
-   map_triple::query_b<0,0,0,0>::range r1 = tm.find(any, any, any, any);
-   BOOST_CHECK_EQUAL( boost::distance(r1), 7 ); //cannot use size
+SCENARIO("Test map triple") {
 
-   map_triple::query_b<1,0,0,0>::range r2 = tm.find(Node_id(0), any, any, any);
-   BOOST_CHECK_EQUAL( r2.size(), 6 );
-
-   map_triple::query_b<1,0,1,0>::range r3 = tm.find(Node_id(0), any, Node_id(0), any);
-   BOOST_CHECK_EQUAL( r3.size(), 5 );
-
-   map_triple::query_b<0,0,0,1>::range r4 = tm.find(any, any, any, Doc_id(1));
-   BOOST_CHECK_EQUAL( r4.size(), 1 );
-
-   map_triple::query_b<1,1,1,1>::range r5 = tm.find(Node_id(0), Node_id(2), Node_id(0), Doc_id(0));
-   BOOST_CHECK_EQUAL( r5.size(), 1 );
-
-   map_triple::query_b<1,0,1,0>::range r6 = tm.find(Node_id(0), any, Node_id(2), any);
-   BOOST_CHECK_EQUAL( r6.size(), 0 );
-
-   map_triple::query_b<0,0,1,0>::range r7 = tm.find(any, any, Node_id(0), any);
-   BOOST_CHECK_EQUAL( r7.size(), 6 );
-
-   map_triple::query_b<1,1,0,0>::range r8 = tm.find(Node_id(0), Node_id(3), any, any);
-   BOOST_CHECK_EQUAL( r8.size(), 3 );
+   GIVEN("I have a map triple") {
+   
+      map_triple tm;
+   
+      AND_GIVEN("I have inserted a bunch of elements in them") {
+   
+         insert_seq(tm, t);
+   
+         WHEN("I search for `any` generic triple") {
+   
+            auto r1 {tm.find(any, any, any, any)};
+   
+            THEN("It's distance should equal size") {
+   
+               REQUIRE(boost::distance(r1) == 7U);
+            }
+         }
+   
+         AND_WHEN("I search for a bunch of elements") {
+   
+            auto r2 {tm.find(Node_id(0), any, any, any)};
+            auto r3 {tm.find(Node_id(0), any, Node_id(0), any)};
+            auto r4 {tm.find(any, any, any, Doc_id(1))};
+            auto r5 {tm.find(Node_id(0), Node_id(2), Node_id(0), Doc_id(0))};
+            auto r6 {tm.find(Node_id(0), any, Node_id(2), any)};
+            auto r7 {tm.find(any, any, Node_id(0), any)};
+            auto r8 {tm. find(Node_id(0), Node_id(3), any, any)};
+   
+            THEN("I should get back distance / sizes of all of them") {
+   
+               REQUIRE(r2.size() == 6);
+               REQUIRE(r3.size() == 5);
+               REQUIRE(r4.size() == 1);
+               REQUIRE(r5.size() == 1);
+               REQUIRE(r6.size() == 0);
+               REQUIRE(r7.size() == 6);
+               REQUIRE(r8.size() == 3);
+            }
+         }
+      }
+   }
 }
 
-/**@test
-*******************************************************************************/
-BOOST_AUTO_TEST_CASE( test_map_triple_02 ) {
-   typedef Map_triple<> map_triple;
-   map_triple mt;
-   insert_seq(mt, random_triples1);
-   BOOST_CHECK_EQUAL(mt.size(), 20U);
+SCENARIO("Map triple test 2") {
 
-   BOOST_CHECK_EQUAL(mt.find(Node_id(6), Node_id(3), any, any).size(), 2);
+   GIVEN("I have a map triple") {
+
+      map_triple mt;
+
+      AND_GIVEN("I have populated it with random triples") {
+
+         insert_seq(mt, random_triples1);
+
+         WHEN("I check the size") {
+
+            auto sz {mt.size()};
+
+            THEN("The size should match as expected") {
+
+               REQUIRE(sz == 20U);
+            }
+
+            AND_WHEN("I search for a subset of triples") {
+
+               auto r {mt.find(Node_id(6), Node_id(3), any, any)};
+
+               THEN("Its size should match as expected") {
+
+                  REQUIRE(r.size() == 2U);
+               }
+            }
+         }
+      }
+   }
 }
-
-}//namespace test
-}//namespace owlcpp
